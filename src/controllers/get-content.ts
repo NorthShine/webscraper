@@ -1,4 +1,4 @@
-import ApiError from '../../exceptions/api-errors';
+import ApiError from '../exceptions/api-errors';
 import { Response, Request, NextFunction } from 'express';
 import puppeteer from 'puppeteer';
 
