@@ -2,13 +2,11 @@ import 'dotenv/config';
 import express from 'express';
 import router from './routes';
 import cors from 'cors';
-import cookieParser from 'cookie-parser';
 import { errorMiddleware } from './middleware/error.middleware';
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cookieParser());
 app.use(
   cors({
     credentials: true,

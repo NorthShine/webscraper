@@ -1,6 +1,6 @@
 import ApiError from '../exceptions/api-errors';
 import { Response, Request, NextFunction } from 'express';
-import puppeteer from 'puppeteer';
+import { firefox } from 'playwright';
 
 export const getContent = async (req: Request, res: Response, next: NextFunction) => {
   const { url } = req.query;
@@ -14,8 +14,9 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
   }
 
   try {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
+    const browser = await firefox.launch({ headless: true });
+    const context = await browser.newContext();
+    const page = await context.newPage();
     await page.goto(url);
     await page.waitForSelector('body');
     const data = await page.evaluate(() => {
@@ -33,19 +34,23 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
         return body;
       };
 
-      const content = getContentElement(body);
+      const contentElement = getContentElement(body);
 
       const formatText = (str: string): string => {
         return str.replace(/\s+/gi, ' ').trim();
       };
 
-      const text = formatText(content.innerText);
-      const images = Array.from(content.querySelectorAll('img')).reduce((acc: string[], img) => {
-        if (img.src) {
-          acc.push(img.src);
-        }
-        return acc;
-      }, []);
+      const text = formatText(contentElement.innerText);
+      const images = Array.from(contentElement.querySelectorAll('img')).reduce(
+        (acc: string[], img) => {
+          const src = img.src;
+          if (src && !acc.includes(src)) {
+            acc.push(src);
+          }
+          return acc;
+        },
+        []
+      );
 
       const getAuthor = (document: Document): string => {
         const metaAuthor = document.querySelector('meta[name="author"]')?.getAttribute('content');
