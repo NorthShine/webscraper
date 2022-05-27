@@ -111,11 +111,13 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
 
       const externalLinks = Array.from(document.querySelectorAll('a'))
         .reduce((acc: string[], el) => {
-          const link = el.href;
-          const url = new URL(link);
-          if (!acc.includes(link) && !document.URL.includes(url.origin)) {
-            acc.push(link);
-          };
+          try {
+            const link = el.href;
+            const url = new URL(link);
+            if (!acc.includes(link) && !document.URL.includes(url.origin)) {
+              acc.push(link);
+            };
+          } catch (err) { }
           return acc;
         }, [])
 
