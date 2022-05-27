@@ -2,6 +2,12 @@ import ApiError from '../exceptions/api-errors';
 import { Response, Request, NextFunction } from 'express';
 import { firefox } from 'playwright';
 
+interface UserComment {
+  user: string;
+  text: string;
+  dateCreated: string;
+}
+
 export const getContent = async (req: Request, res: Response, next: NextFunction) => {
   const { url } = req.query;
 
@@ -17,7 +23,10 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
     const browser = await firefox.launch({ headless: true });
     const context = await browser.newContext();
     const page = await context.newPage();
-    await page.goto(url);
+    await page.goto(url, {
+      waitUntil: 'load',
+      timeout: 0
+    });
     await page.waitForSelector('body');
     const data = await page.evaluate(() => {
       const body = document.body;
@@ -40,7 +49,11 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
         return str.replace(/\s+/gi, ' ').trim();
       };
 
-      const text = formatText(contentElement.innerText);
+      const getInnerText = (el: Document | Element | HTMLElement | null, selector: string) => {
+        const target = el?.querySelector(selector) as HTMLElement | null;
+        return target?.innerText ?? '';
+      }
+
       const images = Array.from(contentElement.querySelectorAll('img')).reduce(
         (acc: string[], img) => {
           const src = img.src;
@@ -53,34 +66,68 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
       );
 
       const getAuthor = (document: Document): string => {
-        const metaAuthor = document.querySelector('meta[name="author"]')?.getAttribute('content');
+        const metaAuthor = document
+          .querySelector('meta[name="author"]')?.getAttribute('content');
         if (metaAuthor) {
           return metaAuthor;
         }
 
-        const schemaAuthor = document.querySelector(
-          '[itemprop="author"] [itemprop="name"]'
-        ) as HTMLElement | null;
+        const schemaAuthor = getInnerText(
+          document,
+          '[itemtype="https://schema.org/Person"][itemprop="author"] [itemprop="name"]'
+        );
         if (schemaAuthor) {
-          return schemaAuthor.innerText;
+          return schemaAuthor;
         }
 
-        const classAuthor = document.querySelector(
-          '.author, #author, [name="author"]'
-        ) as HTMLElement | null;
+        const classAuthor = getInnerText(document, '.author, #author, [name="author"]');
         if (classAuthor) {
-          return classAuthor.innerText;
+          return classAuthor;
         }
 
         return '';
       };
 
-      const author = formatText(getAuthor(document));
+      const getDescription = (document: Document): string => {
+        const metaDescription = document.querySelector('meta[name="description"]')
+          ?.getAttribute('content');
+        return metaDescription ?? '';
+      }
+
+      const getUserComments = (document: Document): UserComment[] => {
+        const comments = document.querySelectorAll('[itemtype="http://schema.org/Comment"]');
+        return Array.from(comments).map(el => {
+          const dateCreatedElement = el
+            .querySelector('[itemprop="dateCreated"]') as HTMLElement | null;
+          const dateCreated = dateCreatedElement?.getAttribute("datetime") ?? '';
+
+          return {
+            user: getInnerText(el, '[itemprop="author"]'),
+            text: getInnerText(el, '[itemprop="text"]'),
+            dateCreated
+          }
+        })
+      }
+
+      const externalLinks = Array.from(document.querySelectorAll('a'))
+        .reduce((acc: string[], el) => {
+          const link = el.href;
+          const url = new URL(link);
+          if (!acc.includes(link) && !document.URL.includes(url.origin)) {
+            acc.push(link);
+          };
+          return acc;
+        }, [])
 
       return {
-        text,
+        title: document.title,
+        lastModified: document.lastModified,
+        description: formatText(getDescription(document)),
+        text: formatText(contentElement.innerText),
+        comments: getUserComments(document),
         images,
-        author
+        externalLinks,
+        author: formatText(getAuthor(document))
       };
     });
     await browser.close();
