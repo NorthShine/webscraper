@@ -3,7 +3,7 @@ name: Deploy Server
 on:
     push:
         branches:
-            - main
+            - dev
 
 jobs:
     build:
@@ -32,14 +32,14 @@ jobs:
                   script: |
                       cd app
                       npm run build
-              - name: Running the server
+            - name: Running the server
               uses: appleboy/ssh-action@master
               with:
-                  host: ${{ secrets.HOST }}
-                  USERNAME: ${{ secrets.USERNAME }}
-                  PORT: ${{ secrets.PORT }}
-                  KEY: ${{ secrets.SSHKEY }}
-                  script: |
-                      cd app/dist
-                      pm2 start index.js
+                    host: ${{ secrets.HOST }}
+                    USERNAME: ${{ secrets.USERNAME }}
+                    PORT: ${{ secrets.PORT }}
+                    KEY: ${{ secrets.SSHKEY }}
+                    script: |
+                        cd app/dist
+                        pm2 start index.js
                       
