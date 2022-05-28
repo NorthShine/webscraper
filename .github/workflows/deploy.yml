@@ -22,7 +22,7 @@ jobs:
               with:
                   source: '.'
                   target: 'app'
-              
+                  
             - name: Building the Server app
               uses: appleboy/ssh-action@master
               with:
