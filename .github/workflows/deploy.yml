@@ -22,6 +22,16 @@ jobs:
               with:
                   source: '.'
                   target: 'app'
+            - name: Installing dependencies
+              uses: appleboy/ssh-action@master
+              with:
+                  host: ${{ secrets.HOST }}
+                  USERNAME: ${{ secrets.USERNAME }}
+                  PORT: ${{ secrets.PORT }}
+                  KEY: ${{ secrets.SSH_KEY }}
+                  script: |
+                      cd app
+                      npm i
             - name: Building the Server app
               uses: appleboy/ssh-action@master
               with:
@@ -41,5 +51,5 @@ jobs:
                     KEY: ${{ secrets.SSH_KEY }}
                     script: |
                         cd app/dist
-                        pm2 start index.js
+                        pm2 start index.js -f
                       
