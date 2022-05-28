@@ -22,20 +22,7 @@ jobs:
               with:
                   source: '.'
                   target: 'app'
-
-            # - name: Creating .env file
-            #   uses: appleboy/ssh-action@master
-            #   with:
-            #       host: ${{ secrets.HOST }}
-            #       USERNAME: ${{ secrets.USERNAME }}
-            #       PORT: ${{ secrets.PORT }}
-            #       KEY: ${{ secrets.SSHKEY }}
-            #       envs: REACT_APP_GOOGLE_CLIENT_ID
-            #       script: |
-            #           cd app
-            #           touch .env >> .env
-            #           echo EMAIL=${{ secrets.EMAIL }} >> .env
-            #           cat .env
+                  
             - name: Building the Server app
               uses: appleboy/ssh-action@master
               with:
