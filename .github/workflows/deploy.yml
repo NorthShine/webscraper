@@ -18,7 +18,7 @@ jobs:
                   HOST: ${{ secrets.HOST }}
                   USERNAME: ${{ secrets.USERNAME }}
                   PORT: ${{ secrets.PORT }}
-                  KEY: ${{ secrets.SSHKEY }}
+                  KEY: ${{ secrets.SSH_KEY }}
               with:
                   source: '.'
                   target: 'app'
@@ -28,7 +28,7 @@ jobs:
                   host: ${{ secrets.HOST }}
                   USERNAME: ${{ secrets.USERNAME }}
                   PORT: ${{ secrets.PORT }}
-                  KEY: ${{ secrets.SSHKEY }}
+                  KEY: ${{ secrets.SSH_KEY }}
                   script: |
                       cd app
                       npm run build
@@ -38,7 +38,7 @@ jobs:
                     host: ${{ secrets.HOST }}
                     USERNAME: ${{ secrets.USERNAME }}
                     PORT: ${{ secrets.PORT }}
-                    KEY: ${{ secrets.SSHKEY }}
+                    KEY: ${{ secrets.SSH_KEY }}
                     script: |
                         cd app/dist
                         pm2 start index.js
