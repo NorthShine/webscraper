@@ -74,7 +74,7 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
 
         const schemaAuthor = getInnerText(
           document,
-          '[itemtype="https://schema.org/Person"][itemprop="author"] [itemprop="name"]'
+          '[itemtype$="schema.org/Person"][itemprop="author"] [itemprop="name"]'
         );
         if (schemaAuthor) {
           return schemaAuthor;
@@ -95,7 +95,7 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
       }
 
       const getUserComments = (document: Document): UserComment[] => {
-        const comments = document.querySelectorAll('[itemtype="http://schema.org/Comment"]');
+        const comments = document.querySelectorAll('[itemtype$="schema.org/Comment"]');
         return Array.from(comments).map(el => {
           const dateCreatedElement = el
             .querySelector('[itemprop="dateCreated"]') as HTMLElement | null;
