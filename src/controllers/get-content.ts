@@ -80,9 +80,19 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
           return schemaAuthor;
         }
 
-        const classAuthor = getInnerText(document, '.author, #author, [name="author"]');
-        if (classAuthor) {
-          return classAuthor;
+        const author = ['^', '$', '*'].reduce((acc, sign) => {
+          if (!acc) {
+            const result = getInnerText(
+              document,
+              `[class${sign}="author"], [id${sign}="author"], [name${sign}="author"]`
+            );
+            acc = result;
+          }
+          return acc;
+        }, '');
+
+        if (author) {
+          return author;
         }
 
         return '';
@@ -123,13 +133,13 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
 
       return {
         title: document.title,
+        author: formatText(getAuthor(document)),
         lastModified: document.lastModified,
         description: formatText(getDescription(document)),
         text: formatText(contentElement.innerText),
         comments: getUserComments(document),
         images,
-        externalLinks,
-        author: formatText(getAuthor(document))
+        externalLinks
       };
     });
     await browser.close();
