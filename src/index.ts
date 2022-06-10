@@ -3,6 +3,8 @@ import express from 'express';
 import router from './routes';
 import cors from 'cors';
 import { errorMiddleware } from './middleware/error.middleware';
+import { REQUEST_TIMEOUT } from './constants';
+import ApiError from './exceptions/api-errors';
 
 const app = express();
 
@@ -15,6 +17,13 @@ app.use(
   })
 );
 app.use(router);
+
+app.use((req, res, next) => {
+  res.setTimeout(REQUEST_TIMEOUT, () => {
+    console.log('Request has timed out.');
+    return next(ApiError.requestTimeout());
+  });
+});
 app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 3001;

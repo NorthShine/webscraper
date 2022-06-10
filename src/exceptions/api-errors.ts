@@ -26,6 +26,10 @@ export default class ApiError extends Error {
     return new ApiError(404, message, errors);
   }
 
+  static requestTimeout(message = 'Request timeout', errors: Array<any> = []) {
+    return new ApiError(408, message, errors);
+  }
+
   static internalError(message = 'Internal Server Error', errors: Array<any> = []) {
     return new ApiError(500, message, errors);
   }

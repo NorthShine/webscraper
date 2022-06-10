@@ -1,6 +1,7 @@
 import ApiError from '../exceptions/api-errors';
 import { Response, Request, NextFunction } from 'express';
 import { firefox } from 'playwright';
+import { REQUEST_TIMEOUT } from '../constants';
 
 interface UserComment {
   user: string;
@@ -80,7 +81,7 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
           return schemaAuthor;
         }
 
-        const author = ['^', '$', '*'].reduce((acc, sign) => {
+        const author = ['^', '$'].reduce((acc, sign) => {
           if (!acc) {
             const result = getInnerText(
               document,
@@ -99,7 +100,7 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
       };
 
       const getDescription = (document: Document): string => {
-        const metaDescription = document.querySelector('meta[name="description"]')
+        const metaDescription = document.querySelector('meta[name="description"], meta[name="Description"]')
           ?.getAttribute('content');
         return metaDescription ?? '';
       }
