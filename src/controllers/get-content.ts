@@ -1,6 +1,7 @@
 import ApiError from '../exceptions/api-errors';
 import { Response, Request, NextFunction } from 'express';
 import { firefox } from 'playwright';
+import { ARTICLES_TYPES } from '../constants';
 
 interface UserComment {
   user: string;
@@ -131,6 +132,18 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
           return acc;
         }, [])
 
+      const isActicle = Array.from(
+        document.querySelectorAll('script[type="application/ld+json"]')
+      ).some((script) => {
+        try {
+          const json = JSON.parse((script as HTMLElement).innerText);
+          const type = json['@type'];
+          return ARTICLES_TYPES.includes(type);
+        } catch (err) {
+          return false;
+        }
+      }, [] as any[]);
+
       return {
         title: document.title,
         author: formatText(getAuthor(document)),
@@ -139,7 +152,8 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
         text: formatText(contentElement.innerText),
         comments: getUserComments(document),
         images,
-        externalLinks
+        externalLinks,
+        isActicle
       };
     });
     await browser.close();
