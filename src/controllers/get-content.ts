@@ -1,7 +1,6 @@
 import ApiError from '../exceptions/api-errors';
 import { Response, Request, NextFunction } from 'express';
 import { firefox } from 'playwright';
-import { ARTICLES_TYPES } from '../constants';
 
 interface UserComment {
   user: string;
@@ -55,17 +54,6 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
         return target?.innerText ?? '';
       }
 
-      const images = Array.from(contentElement.querySelectorAll('img')).reduce(
-        (acc: string[], img) => {
-          const src = img.src;
-          if (src && !acc.includes(src)) {
-            acc.push(src);
-          }
-          return acc;
-        },
-        []
-      );
-
       const getAuthor = (document: Document): string => {
         const metaAuthor = document
           .querySelector('meta[name="author"]')?.getAttribute('content');
@@ -105,32 +93,7 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
         return metaDescription ?? '';
       }
 
-      const getUserComments = (document: Document): UserComment[] => {
-        const comments = document.querySelectorAll('[itemtype$="schema.org/Comment"]');
-        return Array.from(comments).map(el => {
-          const dateCreatedElement = el
-            .querySelector('[itemprop="dateCreated"]') as HTMLElement | null;
-          const dateCreated = dateCreatedElement?.getAttribute("datetime") ?? '';
-
-          return {
-            user: getInnerText(el, '[itemprop="author"]'),
-            text: getInnerText(el, '[itemprop="text"]'),
-            dateCreated
-          }
-        })
-      }
-
-      const externalLinks = Array.from(document.querySelectorAll('a'))
-        .reduce((acc: string[], el) => {
-          try {
-            const link = el.href;
-            const url = new URL(link);
-            if (!acc.includes(link) && !document.URL.includes(url.origin)) {
-              acc.push(link);
-            };
-          } catch (err) { }
-          return acc;
-        }, [])
+      const ARTICLES_TYPES = ['NewsArticle', 'Article'];
 
       const isActicle = Array.from(
         document.querySelectorAll('script[type="application/ld+json"]')
@@ -142,18 +105,15 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
         } catch (err) {
           return false;
         }
-      }, [] as any[]);
+      });
 
       return {
         title: document.title,
         author: formatText(getAuthor(document)),
         lastModified: document.lastModified,
+        isActicle,
         description: formatText(getDescription(document)),
         text: formatText(contentElement.innerText),
-        comments: getUserComments(document),
-        images,
-        externalLinks,
-        isActicle
       };
     });
     await browser.close();
