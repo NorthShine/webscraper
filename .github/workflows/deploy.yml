@@ -32,6 +32,19 @@ jobs:
                   script: |
                       cd app
                       npm i
+            - name: Creating .env file
+              uses: appleboy/ssh-action@master
+              with:
+                  host: ${{ secrets.HOST }}
+                  USERNAME: ${{ secrets.USERNAME }}
+                  PORT: ${{ secrets.PORT }}
+                  KEY: ${{ secrets.SSH_KEY }}
+                  envs: REQUEST_ORIGIN
+                  script: |
+                      cd app
+                      touch .env
+                      echo REQUEST_ORIGIN=${{ secrets.REQUEST_ORIGIN }} >> .env
+                      cat .env
             - name: Building the Server app
               uses: appleboy/ssh-action@master
               with:

@@ -1,7 +1,6 @@
 import ApiError from '../exceptions/api-errors';
 import { Response, Request, NextFunction } from 'express';
 import { firefox } from 'playwright';
-import { REQUEST_TIMEOUT } from '../constants';
 
 interface UserComment {
   user: string;
