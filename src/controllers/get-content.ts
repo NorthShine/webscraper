@@ -20,7 +20,7 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
   }
 
   try {
-    const browser = await firefox.launch();
+    const browser = await firefox.launch({ headless: true });
     const context = await browser.newContext();
     const page = await context.newPage();
     await page.goto(url, {
