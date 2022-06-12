@@ -4,7 +4,7 @@
 
 | Method | Path | Request body | Query params | Response | Description
 | --- | --- | --- | --- | --- | --- |
-| GET  | parser/api/v1/ | ```{}``` | ```url``` | ```{ text: "string", images: ["string"], author: "string" }``` | Get page content |
+| GET  | api/v1/ | ```{}``` | ```url``` | ```{ text: "string", images: ["string"], author: "string" }``` | Get page content |
 
 ## Installation
 
