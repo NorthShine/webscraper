@@ -16,6 +16,9 @@ app.use(
     origin: process.env.REQUEST_ORIGIN
   })
 );
+app.get('/', (req, res) => {
+  res.status(200).send('ping').end();
+})
 app.use(router);
 
 app.use((req, res, next) => {
