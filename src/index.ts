@@ -16,7 +16,7 @@ app.use(
     origin: process.env.REQUEST_ORIGIN
   })
 );
-app.get('parser/', (req, res) => {
+app.get('/parser/', (req, res) => {
   res.status(200).send('ping').end();
 })
 app.use(router);
