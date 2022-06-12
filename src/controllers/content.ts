@@ -2,12 +2,6 @@ import ApiError from '../exceptions/api-errors';
 import { Response, Request, NextFunction } from 'express';
 import { firefox } from 'playwright';
 
-interface UserComment {
-  user: string;
-  text: string;
-  dateCreated: string;
-}
-
 export const getContent = async (req: Request, res: Response, next: NextFunction) => {
   const { url } = req.query;
 
