@@ -95,7 +95,7 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
 
       const ARTICLES_TYPES = ['NewsArticle', 'Article'];
 
-      const isActicle = Array.from(
+      const isArticle = Array.from(
         document.querySelectorAll('script[type="application/ld+json"]')
       ).some((script) => {
         try {
@@ -111,7 +111,7 @@ export const getContent = async (req: Request, res: Response, next: NextFunction
         title: document.title,
         author: formatText(getAuthor(document)),
         lastModified: document.lastModified,
-        isActicle,
+        isArticle,
         description: formatText(getDescription(document)),
         text: formatText(contentElement.innerText),
       };

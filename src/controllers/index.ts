@@ -1,1 +1,1 @@
-export * from './get-content';
+export * from './content';
