@@ -21,7 +21,7 @@ jobs:
                   KEY: ${{ secrets.SSH_KEY }}
               with:
                   source: '.'
-                  target: 'app'
+                  target: 'parser'
             - name: Installing dependencies
               uses: appleboy/ssh-action@master
               with:
@@ -30,7 +30,7 @@ jobs:
                   PORT: ${{ secrets.PORT }}
                   KEY: ${{ secrets.SSH_KEY }}
                   script: |
-                      cd app
+                      cd parser
                       npm i
             - name: Creating .env file
               uses: appleboy/ssh-action@master
@@ -41,7 +41,7 @@ jobs:
                   KEY: ${{ secrets.SSH_KEY }}
                   envs: REQUEST_ORIGIN
                   script: |
-                      cd app
+                      cd parser
                       touch .env
                       echo REQUEST_ORIGIN=${{ secrets.REQUEST_ORIGIN }} >> .env
                       cat .env
@@ -53,7 +53,7 @@ jobs:
                   PORT: ${{ secrets.PORT }}
                   KEY: ${{ secrets.SSH_KEY }}
                   script: |
-                      cd app
+                      cd parser
                       npm run build
             - name: Running the server
               uses: appleboy/ssh-action@master
@@ -63,6 +63,6 @@ jobs:
                     PORT: ${{ secrets.PORT }}
                     KEY: ${{ secrets.SSH_KEY }}
                     script: |
-                        cd app/dist
-                        pm2 restart app
+                        cd parser/dist
+                        pm2 restart parser
                       
